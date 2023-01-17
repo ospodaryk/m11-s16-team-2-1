@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        logger.info("  @GetMapping(\"/create\")");
+        logger.info("______@GetMapping(\"/create\")");
         model.addAttribute("user", new User());
         return "create-user";
     }
@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
         if (result.hasErrors()) {
-            logger.error("@PostMapping(\"/create\")"+result.getAllErrors().toString());
+            logger.error("______@PostMapping(\"/create\")"+result.getAllErrors().toString());
             return "create-user";
         }
         logger.info("@PostMapping(\"/create\")");
@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping("/{id}/read")
     public String read(@PathVariable long id, Model model) {
-        logger.info("@GetMapping(\"/{id}/read\")");
+        logger.info("______@GetMapping(\"/{id}/read\")");
         User user = userService.readById(id);
         model.addAttribute("user", user);
         return "user-info";
@@ -55,7 +55,7 @@ public class UserController {
 
     @GetMapping("/{id}/update")
     public String update(@PathVariable long id, Model model) {
-        logger.info("@GetMapping(\"/{id}/update\")");
+        logger.info("______@GetMapping(\"/{id}/update\")");
         User user = userService.readById(id);
         model.addAttribute("user", user);
         model.addAttribute("roles", roleService.getAll());
@@ -67,7 +67,7 @@ public class UserController {
     public String update(@PathVariable long id, Model model, @Validated @ModelAttribute("user") User user, @RequestParam("roleId") long roleId, BindingResult result) {
         User oldUser = userService.readById(id);
         if (result.hasErrors()) {
-            logger.error(" @PostMapping(\"/{id}/update\")"+result.getAllErrors().toString());
+            logger.error("______ @PostMapping(\"/{id}/update\")"+result.getAllErrors().toString());
             user.setRole(oldUser.getRole());
             model.addAttribute("roles", roleService.getAll());
             return "update-user";
