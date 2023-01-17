@@ -18,4 +18,5 @@ public class HomeController {
         model.addAttribute("users", userService.getAll());
         return "home";
     }
+
 }
