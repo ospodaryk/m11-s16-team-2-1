@@ -22,17 +22,42 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    private final UserDetailsService userDetailsService;
 
+    @Autowired
+    public WebSecurityConfig(@Qualifier("securityService") UserDetailsService userDetailsService) {
+        logger.info("WebSecurityConfig()");
+
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Bean
+    public static PasswordEncoder passwordEncoder(){
+        logger.info("PasswordEncoder passwordEncoder()");
+        return new BCryptPasswordEncoder(10);
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         logger.info("configure(HttpSecurity http)");
 
         http.authorizeRequests()
-                .antMatchers("/users/create")
-                .not().fullyAuthenticated()
-                .antMatchers("/form-login")
-                .permitAll().anyRequest().hasAuthority("ADMIN")
-                .and().formLogin()
-                .loginPage("/form-login");
+                .antMatchers("/", "/home", "/users/create")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/form-login")
+                .defaultSuccessUrl("/home", true)
+                .permitAll()
+                .and()
+                .logout()
+                .logoutSuccessUrl("/form-login?logout=true")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+                .and()
+                .exceptionHandling();
     }
 }
