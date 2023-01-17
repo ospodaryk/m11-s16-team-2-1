@@ -32,32 +32,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public static PasswordEncoder passwordEncoder(){
+    public static PasswordEncoder passwordEncoder() {
         logger.info("PasswordEncoder passwordEncoder()");
         return new BCryptPasswordEncoder(10);
     }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         logger.info("configure(HttpSecurity http)");
 
-        http.authorizeRequests()
-                .antMatchers("/", "/home", "/users/create")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+        http
+                .authorizeRequests()
+                .antMatchers("/users/create").not().fullyAuthenticated()
+                .antMatchers("/form-login").permitAll()
+                .anyRequest().hasAuthority("ADMIN")
                 .and()
                 .formLogin()
-                .loginPage("/form-login")
-                .defaultSuccessUrl("/home", true)
-                .permitAll()
-                .and()
-                .logout()
-                .logoutSuccessUrl("/form-login?logout=true")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-                .and()
-                .exceptionHandling();
+                .loginPage("/form-login");
     }
 }
