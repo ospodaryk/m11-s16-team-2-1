@@ -18,4 +18,9 @@ public class HomeController {
         model.addAttribute("users", userService.getAll());
         return "home";
     }
+
+    @GetMapping("/form-login")
+    public String login() {
+        return "form-login";
+    }
 }
