@@ -24,13 +24,13 @@ public class SecurityService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("We are loadUserByUsername()");
+        logger.info("_____We are loadUserByUsername()");
         User user = userRepository.findByEmail(username);
         if(user==null) {
-            logger.error("user==null");
+            logger.error("_____user==null");
             throw new UsernameNotFoundException("User with this email does not exists");
         }
-        logger.info("Everything fine");
+        logger.info("_____Everything fine");
         return new Security(user);
     }
 }

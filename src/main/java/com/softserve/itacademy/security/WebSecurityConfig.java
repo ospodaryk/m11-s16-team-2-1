@@ -21,33 +21,50 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    private final SecurityService personDetailsService;
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-    private final UserDetailsService userDetailsService;
 
     @Autowired
-    public WebSecurityConfig(@Qualifier("securityService") UserDetailsService userDetailsService) {
-        logger.info("WebSecurityConfig()");
-
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(SecurityService personDetailsService) {
+        this.personDetailsService = personDetailsService;
     }
 
     @Bean
-    public static PasswordEncoder passwordEncoder() {
-        logger.info("PasswordEncoder passwordEncoder()");
-        return new BCryptPasswordEncoder(10);
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(personDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder());
+    }
+
+    @Autowired
+    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(personDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         logger.info("configure(HttpSecurity http)");
 
-        http
+        http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/users/create").not().fullyAuthenticated()
-                .antMatchers("/form-login").permitAll()
-                .anyRequest().hasAuthority("ADMIN")
+                .antMatchers("/form-login", "/users/create", "/error").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/form-login");
+                .loginPage("/form-login")
+//                .loginProcessingUrl("/process_login")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/form-login?error=true")
+                .permitAll()
+                .and()
+                .logout()
+//                .logoutUrl("/logout")
+                .logoutSuccessUrl("/form-login")
+                .deleteCookies("JSESSIONID");
     }
 }
