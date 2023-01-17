@@ -7,6 +7,8 @@ import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.service.StateService;
 import com.softserve.itacademy.service.TaskService;
 import com.softserve.itacademy.service.ToDoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +21,7 @@ public class TaskController {
     private final TaskService taskService;
     private final ToDoService todoService;
     private final StateService stateService;
+    private static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
     public TaskController(TaskService taskService, ToDoService todoService, StateService stateService) {
         this.taskService = taskService;
@@ -53,6 +56,7 @@ public class TaskController {
 
     @GetMapping("/{task_id}/update/todos/{todo_id}")
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model) {
+       logger.info("________@GetMapping(\"/{task_id}/update/todos/{todo_id}\")");
         TaskDto taskDto = TaskTransformer.convertToDto(taskService.readById(taskId));
         model.addAttribute("task", taskDto);
         model.addAttribute("priorities", Priority.values());
@@ -64,6 +68,8 @@ public class TaskController {
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task")TaskDto taskDto, BindingResult result) {
         if (result.hasErrors()) {
+            logger.error("____@PostMapping(\"/{task_id}/update/todos/{todo_id}\")"+result.getAllErrors().toString());
+
             model.addAttribute("priorities", Priority.values());
             model.addAttribute("states", stateService.getAll());
             return "update-task";
@@ -73,6 +79,7 @@ public class TaskController {
                 todoService.readById(taskDto.getTodoId()),
                 stateService.readById(taskDto.getStateId())
         );
+        logger.info("________@PostMapping(\"/{task_id}/update/todos/{todo_id}\")");
         taskService.update(task);
         return "redirect:/todos/" + todoId + "/tasks";
     }
