@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     public ModelAndView entityNotFoundExceptionHandler(HttpServletRequest request, EntityNotFoundException exception) {
         return getModelAndView(request, HttpStatus.NOT_FOUND, exception);
     }
-
+//
 //    @ExceptionHandler(Exception.class)
 //    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
 //    public ModelAndView internalServerErrorHandler(HttpServletRequest request, Exception exception) {
