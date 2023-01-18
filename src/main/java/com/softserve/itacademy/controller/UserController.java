@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Controller
 @RequestMapping("/users")
@@ -35,7 +36,7 @@ public class UserController {
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
         if (result.hasErrors()) {
-            logger.error("______@PostMapping(\"/create\")"+result.getAllErrors().toString());
+            logger.error("______@PostMapping(\"/create\")" + result.getAllErrors().toString());
             return "create-user";
         }
         logger.info("@PostMapping(\"/create\")");
@@ -45,6 +46,7 @@ public class UserController {
         return "redirect:/todos/all/users/" + newUser.getId();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     @GetMapping("/{id}/read")
     public String read(@PathVariable long id, Model model) {
         logger.info("______@GetMapping(\"/{id}/read\")");
@@ -53,6 +55,7 @@ public class UserController {
         return "user-info";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     @GetMapping("/{id}/update")
     public String update(@PathVariable long id, Model model) {
         logger.info("______@GetMapping(\"/{id}/update\")");
@@ -62,12 +65,12 @@ public class UserController {
         return "update-user";
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     @PostMapping("/{id}/update")
     public String update(@PathVariable long id, Model model, @Validated @ModelAttribute("user") User user, @RequestParam("roleId") long roleId, BindingResult result) {
         User oldUser = userService.readById(id);
         if (result.hasErrors()) {
-            logger.error("______ @PostMapping(\"/{id}/update\")"+result.getAllErrors().toString());
+            logger.error("______ @PostMapping(\"/{id}/update\")" + result.getAllErrors().toString());
             user.setRole(oldUser.getRole());
             model.addAttribute("roles", roleService.getAll());
             return "update-user";
@@ -81,13 +84,14 @@ public class UserController {
         return "redirect:/users/" + id + "/read";
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable("id") long id) {
         userService.delete(id);
         return "redirect:/users/all";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/all")
     public String getAll(Model model) {
         model.addAttribute("users", userService.getAll());
