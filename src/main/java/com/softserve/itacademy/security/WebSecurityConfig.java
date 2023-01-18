@@ -1,6 +1,6 @@
 package com.softserve.itacademy.security;
 
-import com.softserve.itacademy.exception.CustomAccessDeniedException;
+//import com.softserve.itacademy.exception.CustomAccessDeniedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +31,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new CustomAccessDeniedException();
-    }
+//    @Bean
+//    public AccessDeniedHandler accessDeniedHandler() {
+//        return new CustomAccessDeniedException();
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -64,10 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutSuccessUrl("/form-login?logout=true")
-                .deleteCookies("JSESSIONID")
-                .and()
-                .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler());
+                .deleteCookies("JSESSIONID");
+//                .and()
+//                .exceptionHandling()
+//                .accessDeniedHandler(new CustomAccessDeniedException());
     }
 }
 
