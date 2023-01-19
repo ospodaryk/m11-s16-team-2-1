@@ -97,7 +97,7 @@ public class ToDoController {
         model.addAttribute("user", userService.readById(userId));
         return "todos-user";
     }
-
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.principal.id==@toDoServiceImpl.readById(#id).owner.id")
     @GetMapping("/{id}/add")
     public String addCollaborator(@PathVariable long id, @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
@@ -107,7 +107,7 @@ public class ToDoController {
         todoService.update(todo);
         return "redirect:/todos/" + id + "/tasks";
     }
-
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.principal.id==@toDoServiceImpl.readById(#id).owner.id")
     @GetMapping("/{id}/remove")
     public String removeCollaborator(@PathVariable long id, @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
